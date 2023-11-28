@@ -1,0 +1,44 @@
+# packages/tasks/install.yml
+
+- name: Enabling openstack repository on openSUSE
+  community.general.zypper_repository:
+    repo: 'obs://Cloud:OpenStack:Stein/openSUSE_Leap_15.0'
+    name: Cloud:OpenStack:Stein
+    state: present
+    auto_import_keys: true
+  become: yes
+  become_user: root
+  become_method: sudo
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/sbin:/sbin:/usr/bin"
+
+- name: Refreshing the zypper repository
+  community.general.zypper:
+    name: '*'
+    state: latest
+
+- name: Installing Python 3 on SUSE
+  community.general.zypper:
+    name: python3
+    state: present
+  become: yes
+  become_user: root
+  become_method: sudo
+  when: "ansible_distribution == 'SUSE'"
+
+- name: Installing openstackclient dependencies
+  community.general.zypper:
+    name: python3-openstackclient
+    state: present
+  become: yes
+  become_user: root
+  become_method: sudo
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/sbin:/sbin:/usr/bin"
+
+- name: Verifying installation of openstackclient
+  command: openstack --version
+  register: openstack_version
+
+- debug:
+    var: openstack_version.stdout

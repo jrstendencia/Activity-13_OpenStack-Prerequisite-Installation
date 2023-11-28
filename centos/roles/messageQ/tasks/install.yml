@@ -1,0 +1,14 @@
+- name: Installing rabbitmq-server
+  yum:
+    name: rabbitmq-server
+    state: latest
+
+- name: Starting RabbitMQ service
+  systemd:
+    name: rabbitmq-server.service
+    state: started
+  async: 1200
+  poll: 0
+  become: true
+
+  notify: Configuring rabbitmq-server

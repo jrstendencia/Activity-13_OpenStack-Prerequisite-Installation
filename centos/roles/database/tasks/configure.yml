@@ -1,0 +1,25 @@
+- name: Copying openstack.cnf file
+  copy:
+    src: openstack.cnf
+    dest: /etc/my.cnf.d/openstack.cnf
+    owner: root
+    group: root
+    mode: 644
+
+  notify: Restarting database service
+
+- name: Starting and enabling mariadb.service
+  service:
+    name: mariadb.service
+    state: started
+    enabled: true
+
+- name: Adding MySQL service to the firewall
+  become: yes
+  become_user: root
+  command: "firewall-cmd --zone=public --add-service=mysql --permanent"
+
+- name: Reloading the firewall to apply changes
+  become: yes
+  become_user: root
+  command: "firewall-cmd --reload"

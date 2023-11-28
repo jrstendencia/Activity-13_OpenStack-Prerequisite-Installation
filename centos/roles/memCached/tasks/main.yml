@@ -1,0 +1,20 @@
+# memCached/tasks/main.yml
+- import_tasks: install.yml
+- import_tasks: configure.yml
+
+- block:
+  - name: Verifying installation of memcached
+    command: memcached -h
+    register: memcached_version
+
+  - debug:
+      msg: "{{ memcached_version.stdout_lines }}"
+
+- block:
+  - name: Verifying if memcached is started and running in the background
+    command: memcached -C /etc/sysconfig/memcached -t 1 -u memcached
+    register: memcached_service
+    ignore_errors: true  # Ignore errors to proceed with the next task even if this one fails
+
+  - debug:
+      msg: "{{ memcached_service.stdout_lines }}"

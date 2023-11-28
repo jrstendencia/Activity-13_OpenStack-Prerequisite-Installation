@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  become: yes
+  tasks:
+    - name: Ensure dpkg is configured
+      command: dpkg --configure -a
+      ignore_errors: yes  # Ignore errors to proceed even if there was no interruption
+
+    - name: Updating and upgrading the operating system
+      apt:
+        upgrade: safe
+        update_cache: yes
+      become: yes
+
+- hosts: controller_node
+  become: yes
+  roles:
+    - ntp
+    - packages
+    - database
+    - messageQ
+    - memCached
+    - etcd
